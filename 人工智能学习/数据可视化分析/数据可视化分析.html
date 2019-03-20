@@ -1,0 +1,271 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
+<title>数据可视化分析</title></head>
+<body><h1>学机器学习，不会数据分析怎么行——数据可视化分析</h1>
+<h2>前言</h2>
+<p>前面两篇文章介绍了 python 中两大模块 pandas 和 numpy 的一些基本使用方法，然而，仅仅会处理数据还是不够的，我们需要学会怎么分析，毫无疑问，利用图表对数据进行分析是最容易的，通过图表可以很好地理解数据之间的关联性以及某些数据的变化趋势。因此，将在这篇博客中介绍 python 中可视化工具 matplotlib 的使用。</p>
+<h2>Figure 和 Subplot</h2>
+<p>matplotlib 的图像都位于 Figure 对象中，可以用 <code>plt.figure</code> 创建一个新的 Figure</p>
+<pre><code class='language-python' lang='python'>fig = plt.figure()
+</code></pre>
+<p><code>plt.figure</code> 有一些选项，如 figsize(用于设置图片大小)。不能通过空 Figure 绘图，必须用 <code>add_subplot</code> 创建一个或多个 subplot 才行</p>
+<pre><code class='language-python' lang='python'>ax1 = fig.add_subplot(2,2,1) # 2*2 的图像，选中的是4个subplot中的第一个
+ax2 = fig.add_subplot(2,2,2)
+ax3 = fig.add_subplot(2,2,3)
+</code></pre>
+<p>最终得到的图如下所示
+<img src='1.png' alt='1' referrerPolicy='no-referrer' /></p>
+<p>画三张图</p>
+<pre><code class='language-python' lang='python'>ax3.plot(np.random.randn(50).cumsum(),&#39;k--&#39;) # k--表示线型
+_ = ax1.hist(np.random.randn(100),bins=20,color=&#39;k&#39;,alpha=0.3)
+ax2.scatter(np.arange(30),np.arange(30)+3*np.random.randn(30))
+</code></pre>
+<p><img src='2.png' alt='2' referrerPolicy='no-referrer' /></p>
+<p>上图中只是三种图表类型，你可以在matplotlib的文档中找到各种图表类型。由于根据特定布局创建Figure和subplot是一件非常常见的任务，于是便出现了一个更为方便的方法 <code>plt.subplots</code> ，它可以创建一个新的Figure，并返回一个含有已创建的subplot对象的NumPy数组</p>
+<pre><code class='language-python' lang='python'>fig, axes = plt.subplots(2,3)
+axes
+</code></pre>
+<p><img src='3.png' alt='3' referrerPolicy='no-referrer' /></p>
+<p>这种方法非常的实用，我们可以轻松对axes数据进行索引。我们还可以通过 <code>sharex</code> 和 <code>sharey</code> 指定 subplot 应该具有的X轴和Y轴。在比较相同范围的数据时，这也是非常实用的，否则，matplotlib 会自动缩放各图表的界限。</p>
+<p><img src='4.png' alt='4' referrerPolicy='no-referrer' /></p>
+<h2>图表各要素</h2>
+<p>下面在介绍介绍如何添加图表的各个要素  </p>
+<h3>标题、轴标签、刻度以及刻度标签</h3>
+<p>要修改X轴的刻度，最简单的方法是使用set_xticks和set_xticklabels。前者告诉matplotlib要将刻度放在数据范围中的哪些位置，默认情况下，这些位置也就是刻度标签。但我们可以通过set_xticklabels将任何其他的值作用于标签</p>
+<pre><code class='language-python' lang='python'># 绘制一段随机漫步
+fig = plt.figure()
+ax = fig.add_subplot(1,1,1)
+ax.plot(np.random.randn(1000).cumsum())
+</code></pre>
+<p><img src='5.png' alt='5' referrerPolicy='no-referrer' /></p>
+<pre><code class='language-python' lang='python'>ticks = ax.set_xticks([0,250,500,750,1000])
+labels = ax.set_xticklabels([&#39;one&#39;,&#39;two&#39;,&#39;three&#39;,&#39;four&#39;,&#39;five&#39;])
+ax.set_title(&#39;My first matplotlib plot&#39;)
+ax.set_xlabel(&#39;stages&#39;)
+</code></pre>
+<p><img src='6.png' alt='6' referrerPolicy='no-referrer' /></p>
+<h3>图例</h3>
+<pre><code class='language-python' lang='python'>ax.plot(np.random.randn(1000).cumsum(),label = &#39;one&#39;)
+ax.plot(np.random.randn(1000).cumsum(),&#39;k--&#39;,label=&#39;two&#39;)
+ax.plot(np.random.randn(1000).cumsum(),&#39;k.&#39;,label=&#39;three&#39;)
+ax.legend(loc=&#39;best&#39;) # loc 告诉matplotlib要将图例放在哪	
+</code></pre>
+<p><img src='7.png' alt='7' referrerPolicy='no-referrer' /></p>
+<h3>注释</h3>
+<p>除标准的图标对象之外，你可能还希望绘制一些自定以的注解（比如文本、箭头或其他图形等）<br/>注解可以通过 <code>text</code>, <code>arrow</code>和<code>annotate</code>等函数进行添加。<code>text</code>可以将文本绘制在图表的指定坐标 (x,y)​ ，还可以加上一些自定以格式</p>
+<pre><code class='language-python' lang='python'>ax.text(x,y,&#39;Hello World!&#39;, family=&#39;monospace&#39;, fontsize=10, verticalalignment=&quot;top&quot;, horizontalalignment=&quot;right&quot;)
+</code></pre>
+<p>x,y:表示坐标值上的值<br/>string:表示说明文字<br/>fontsize:表示字体大小<br/>verticalalignment：垂直对齐方式 ，参数：[ ‘center’ | ‘top’ | ‘bottom’ | ‘baseline’ ]<br/>horizontalalignment：水平对齐方式 ，参数：[ ‘center’ | ‘right’ | ‘left’ ]  </p>
+<p>&nbsp;</p>
+<pre><code class='language-python' lang='python'>x1 = np.random.normal(30, 3, 100)
+x2 = np.random.normal(20, 2, 100)
+
+plt.plot(x1, label = &#39;plot&#39;)
+plt.plot(x2, label = &#39;2nd plot&#39;)
+plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=2,
+           ncol=2, mode=&#39;expand&#39;, borderaxespad=0.)
+plt.annotate(&#39;Important value&#39;, (55,20),
+             xycoords=&#39;data&#39;,
+             xytext=(5,38),
+             arrowprops = dict(arrowstyle = &#39;-&gt;&#39;))
+
+plt.show()
+</code></pre>
+<p><img src='8.png' alt='8' referrerPolicy='no-referrer' /></p>
+<p>annotate(s=&#39;str&#39; ,xy=(x,y) ,xytext=(l1,l2) ,..)</p>
+<p>s 为注释文本内容 <br/>xy 为被注释的坐标点<br/>xytext 为注释文字的坐标位置<br/>xycoords 参数如下:  </p>
+<ul>
+<li>figure points          points from the lower left of the figure 点在图左下方</li>
+
+</ul>
+<ul>
+<li>figure pixels          pixels from the lower left of the figure 图左下角的像素</li>
+
+</ul>
+<ul>
+<li>figure fraction       fraction of figure from lower left 左下角数字部分axes </li>
+
+</ul>
+<ul>
+<li>points           points from lower left corner of axes 从左下角点的坐标axes </li>
+
+</ul>
+<ul>
+<li>pixels           pixels from lower left corner of axes 从左下角的像素坐标</li>
+
+</ul>
+<ul>
+<li>axes fraction        fraction of axes from lower left 左下角部分</li>
+
+</ul>
+<ul>
+<li>data                     use the coordinate system of the object being annotated(default) 使用的坐标系统被注释的对象（默认）</li>
+
+</ul>
+<ul>
+<li>polar(theta,r)       if not native ‘data’ coordinates t</li>
+
+</ul>
+<p><code>extcoords</code> 设置注释文字偏移量</p>
+<figure><table>
+<thead>
+<tr><th style='text-align:center;' >参数</th><th style='text-align:center;' >坐标系</th></tr></thead>
+<tbody><tr><td style='text-align:center;' >&#39;figure points&#39;</td><td style='text-align:center;' >距离图形左下角的点数量</td></tr><tr><td style='text-align:center;' >&#39;figure pixels&#39;</td><td style='text-align:center;' >距离图形左下角的像素数量</td></tr><tr><td style='text-align:center;' >&#39;figure fraction&#39;</td><td style='text-align:center;' >0,0 是图形左下角，1,1 是右上角</td></tr><tr><td style='text-align:center;' >&#39;axes points&#39;</td><td style='text-align:center;' >距离轴域左下角的点数量</td></tr><tr><td style='text-align:center;' >&#39;axes pixels&#39;</td><td style='text-align:center;' >距离轴域左下角的像素数量</td></tr><tr><td style='text-align:center;' >&#39;axes fraction&#39;</td><td style='text-align:center;' >0,0 是轴域左下角，1,1 是右上角</td></tr><tr><td style='text-align:center;' >&#39;data&#39;</td><td style='text-align:center;' >使用轴域数据坐标系</td></tr></tbody>
+</table></figure>
+<p><code>arrowprops</code>  #箭头参数,参数类型为字典dict</p>
+<ul>
+<li>width           the width of the arrow in points                              点箭头的宽度</li>
+<li>headwidth   the width of the base of the arrow head in points  在点的箭头底座的宽度</li>
+<li>headlength  the length of the arrow head in points                   点箭头的长度</li>
+<li>shrink          fraction of total length to ‘shrink’ from both ends  总长度为分数“缩水”从两端</li>
+<li>facecolor     箭头颜色</li>
+
+</ul>
+<p>bbox给标题增加外框 ，常用参数如下：</p>
+<ul>
+<li>boxstyle方框外形  </li>
+<li>facecolor(简写fc)背景颜色  </li>
+<li>edgecolor(简写ec)边框线条颜色  </li>
+<li>edgewidth边框线条大小</li>
+
+</ul>
+<pre><code class='language-python' lang='python'>bbox=dict(boxstyle=&#39;round,pad=0.5&#39;, fc=&#39;yellow&#39;, ec=&#39;k&#39;,lw=1 ,alpha=0.5)  #fc为facecolor,ec为edgecolor,lw为lineweight
+</code></pre>
+<h2>pandas中的绘图函数</h2>
+<p>我们平时基本都是使用pandas处理数据，所以，能够利用pandas中内置的plot来画图会方便许多，下面将介绍几种常用图表的画法</p>
+<h3>线型图</h3>
+<p>Series 和 DataFrame 都有一个用于生成各类图表的plot方法。默认情况下为线型图</p>
+<pre><code class='language-python' lang='python'>s = pd.Series(np.random.randn(10).cumsum(),index=np.arange(0,100,10))
+s.plot()
+</code></pre>
+<p><img src='9.png' alt='9' referrerPolicy='no-referrer' /></p>
+<p>该Series对象的索引会被传给matplotlib，并用以绘制X轴。可以通过use_index=False禁用该功能。X轴的刻度和界限可以通过xticks和xlim选项进行调节，Y轴就用yticks和ylim。<br/>DataFrame的plot方法会在一个subplot中为各列绘制一条线，并自动创建图例</p>
+<pre><code class='language-python' lang='python'>df = pd.DataFrame(np.random.randn(10,4).cumsum(0),columns=[&#39;A&#39;,&#39;B&#39;,&#39;C&#39;,&#39;D&#39;],index=np.arange(0,100,10))
+df.plot()
+</code></pre>
+<p><img src='10.png' alt='10' referrerPolicy='no-referrer' /></p>
+<p>Series.plot参数如下：</p>
+<ul>
+<li>label 	用于图例标签</li>
+<li>ax 	要在其上进行绘制的matplotlib subplot对象。</li>
+<li>style 	将要传给matplotlib的风格字符串（如&#39;ko--&#39;）</li>
+<li>alpha 	图表的填充不透明度(0-1)</li>
+<li>kind 	可以是&#39;line&#39; &#39;bar&#39; &#39;barch&#39; &#39;kde&#39;</li>
+<li>logy 	在Y轴上是同对数标尺</li>
+<li>use_index 	将对象的索引用作刻度标签</li>
+<li>rot 	旋转刻度标签(0-360)</li>
+<li>xticks 	用作X轴刻度的值</li>
+<li>yticks 	用作Y轴刻度的值</li>
+<li>xlim 	X轴的界限</li>
+<li>ylim	Y轴的界限</li>
+<li>grid 	显示轴网格线（默认打开）</li>
+
+</ul>
+<p>专用于DataFrame的plot参数：</p>
+<ul>
+<li>subplots 	将各个DataFrame列绘制到单独的subplot中</li>
+<li>sharex 	如果subplots=True，则共用同一个X轴，包括刻度和界限</li>
+<li>sharey 	如果subplots=True，则共用同一个Y轴</li>
+<li>figsize 	表示图像大小的元组</li>
+<li>title 	表示图像标题的字符串</li>
+<li>legend 	添加一个subplot图例</li>
+<li>sort_columns 	以字母表示顺序绘制各列，默认使用当前列顺序
+<em>注：有关时间序列的处理这篇博客中暂时不写，将在后续博客中补充</em></li>
+
+</ul>
+<h3>柱状图</h3>
+<p>在生成线型图的代码中加上kind=&#39;bar&#39;或kind=&#39;barh&#39;即可生成柱状图。这时，Series和DataFrame的索引将会被用作X或Y刻度</p>
+<pre><code class='language-python' lang='python'>fig, axes = plt.subplots(2,1)
+data = pd.Series(np.random.rand(16),index=list(&#39;abcdefghijklmnop&#39;))
+data.plot(kind=&#39;bar&#39;,ax=axes[0],color=&#39;k&#39;,alpha=0.8,figsize=(8,10))
+data.plot(kind=&#39;barh&#39;,ax=axes[1],color=&#39;k&#39;,alpha=0.8,figsize=(8,10))
+</code></pre>
+<p><img src='11.png' alt='11' referrerPolicy='no-referrer' /></p>
+<pre><code class='language-python' lang='python'>df = pd.DataFrame(np.random.rand(6,4),index=[&#39;one&#39;,&#39;two&#39;,&#39;three&#39;,&#39;four&#39;,&#39;five&#39;,&#39;six&#39;],columns=pd.Index([&#39;A&#39;,&#39;B&#39;,&#39;C&#39;,&#39;D&#39;],name=&#39;Genus&#39;))
+df
+</code></pre>
+<p><img src='12.png' alt='12' referrerPolicy='no-referrer' /></p>
+<pre><code class='language-python' lang='python'>df.plot(kind=&#39;bar&#39;)
+</code></pre>
+<p><img src='13.png' alt='13' referrerPolicy='no-referrer' /></p>
+<pre><code class='language-python' lang='python'>df.plot(kind=&#39;barh&#39;,stacked=True) # 设置stacked为True生成堆叠图
+</code></pre>
+<p><img src='14.png' alt='14' referrerPolicy='no-referrer' /></p>
+<p><em>注：柱状图可以利用value_counts图形化显示Series中各值出现的频率</em></p>
+<pre><code class='language-python' lang='python'>df.div(df.sum(1).astype(float),axis=0).plot(kind=&#39;barh&#39;,stacked=True)
+</code></pre>
+<p><img src='15.png' alt='15' referrerPolicy='no-referrer' /></p>
+<h3>直方图和密度图</h3>
+<p>直方图是一种可以对值频率进行离散化显示的柱状图，。数据点被拆分到离散的、间隔均匀的面元中，绘制的时各面元中数据点的数量。</p>
+<pre><code class='language-python' lang='python'>length = pd.DataFrame({&#39;length&#39;: [10, 20,15,10,1,12,12,12,13,13,13,14,14,14,41,41,41,41,41,4,4,4,4]})
+length.plot.hist()
+</code></pre>
+<p><img src='16.png' alt='16' referrerPolicy='no-referrer' /></p>
+<p>与直方图相关的一种图表类型时密度图，它是通过计算“可能会产生观测数据的连续概率分布的估计”而产生的。一般的过程是将该分布近似为一组核（即诸如正态（高斯）分布之类的较为简单的分布）。因此，密度图也被称作KDE图，调用plot时加上kind=&#39;kde&#39;即可生成一张密度图（标准混合正态分布）。</p>
+<pre><code>length.plot(kind=&#39;kde&#39;)
+</code></pre>
+<p><img src='17.png' alt='17' referrerPolicy='no-referrer' /></p>
+<pre><code class='language-python' lang='python'>df4 = pd.DataFrame({&#39;a&#39;: np.random.randn(1000) + 1, &#39;b&#39;: np.random.randn(1000), &#39;c&#39;: np.random.randn(1000) - 1}, index=range(1,1001), columns=[&#39;a&#39;, &#39;b&#39;, &#39;c&#39;])  #bins=20表示数值分辨率，具体来说是将随机数设定一个范围，例如5.6，5.7，6.5，如果数值分辨率越低，则会将三个数分到5-7之间，如果数值分辨率越高，则会将5.6，5.7分到5-6之间，而6.5分到6-7之间；值越小表示分辨率越低，值越大表示分辨率越高；
+df4.plot.hist(stacked=True, bins=20, alpha=0.5)
+</code></pre>
+<p><img src='18.png' alt='18' referrerPolicy='no-referrer' /></p>
+<pre><code class='language-python' lang='python'>df4.diff().hist(color=&#39;k&#39;, alpha=0.5, bins=50) #可将DataFrame当中column分开
+</code></pre>
+<p>这两种图表常常会被画在一起。直方图以规格化形式给出（以便给出面元化密度），然后再在其上绘制核密度估计。</p>
+<pre><code>comp1 = np.random.normal(0,1,size=200)
+comp2 = np.random.normal(10,2,size=200)
+values = pd.Series(np.concatenate([comp1,comp2]))
+values.hist(bins=100,alpha=0.3,color=&#39;k&#39;,normed=True)
+values.plot(kind=&#39;kde&#39;)
+</code></pre>
+<p><img src='19.png' alt='19' referrerPolicy='no-referrer' /></p>
+<h3>散点图</h3>
+<p>散点图（scatter plot）是观察两个一维数据序列之间的关系的有效手段。matplotlib的scatter方法是绘制散点图的主要方法。</p>
+<pre><code>df = pd.DataFrame(np.random.rand(50, 4), columns=[&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;])
+df.plot.scatter(x=&#39;a&#39;, y=&#39;b&#39;) # 以a列为X轴数值，b列为Y轴数值绘制散点图
+</code></pre>
+<p><img src='20.png' alt='20' referrerPolicy='no-referrer' /></p>
+<p>如果想将不同的散点图信息绘制到一张图片当中，需要利用不同的颜色和标签进行区分</p>
+<pre><code>ax = df.plot.scatter(x=&#39;a&#39;, y=&#39;b&#39;, color=&#39;Blue&#39;, label=&#39;Group 1&#39;)
+df.plot.scatter(x=&#39;c&#39;, y=&#39;d&#39;, color=&#39;Green&#39;, label=&#39;Group 2&#39;, ax=ax)
+</code></pre>
+<p><img src='21.png' alt='21' referrerPolicy='no-referrer' /></p>
+<p>在探索式数据分析（EDA）工作中，同时观察一组变量的散点图是很有意义的，这也被称为散点图矩阵。</p>
+<pre><code>from sklearn.datasets import load_iris # 使用sklearn库里的iris数据集
+iris_dataset = load_iris()
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_train,y_test = train_test_split(iris_dataset[&#39;data&#39;],iris_dataset[&#39;target&#39;],random_state=0)
+iris_dataframe=pd.DataFrame(X_train,columns=iris_dataset.feature_names)
+grr = pd.plotting.scatter_matrix(iris_dataframe,marker=&#39;o&#39;,c = y_train,hist_kwds={&#39;bins&#39;:20},figsize=(12,10))
+</code></pre>
+<p><img src='22.png' alt='22' referrerPolicy='no-referrer' /></p>
+<h3>饼图</h3>
+<p>饼图展现的是百分比关系</p>
+<pre><code>series = pd.Series(4 * np.random.rand(4), index=[&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;], name=&#39;series&#39;)
+series.plot.pie(figsize=(6, 6))
+</code></pre>
+<p><img src='23.png' alt='23' referrerPolicy='no-referrer' /></p>
+<p>对于DataFrame对象，每一个column都可独立绘制一张饼图，但需要利用subplots=True参数将，每个饼图绘制到同一张图中。 
+	df = pd.DataFrame(3 * np.random.rand(4, 2), index=[&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;], columns=[&#39;x&#39;, &#39;y&#39;])
+	df.plot.pie(subplots=True, figsize=(8, 4))</p>
+<p><img src='24.png' alt='24' referrerPolicy='no-referrer' /></p>
+<p><em>由于箱型图接触不多，涉及内容较多且较为重要，后面会另写一篇关于箱型图的博客</em></p>
+<h3>各种绘图方式对于缺失值的处理</h3>
+<p>Missing values are dropped, left out, or filled depending on the plot type </p>
+<figure><table>
+<thead>
+<tr><th style='text-align:center;' >图表</th><th style='text-align:center;' >处理方式</th></tr></thead>
+<tbody><tr><td style='text-align:center;' >Plot Type</td><td style='text-align:center;' >NaN Handling</td></tr><tr><td style='text-align:center;' >Line</td><td style='text-align:center;' >Leave gaps at NaNs</td></tr><tr><td style='text-align:center;' >Line (stacked)</td><td style='text-align:center;' >Fill 0’s</td></tr><tr><td style='text-align:center;' >Bar</td><td style='text-align:center;' >Fill 0’s</td></tr><tr><td style='text-align:center;' >Scatter</td><td style='text-align:center;' >Drop NaNs</td></tr><tr><td style='text-align:center;' >Histogram</td><td style='text-align:center;' >Drop NaNs (column-wise)</td></tr><tr><td style='text-align:center;' >Box</td><td style='text-align:center;' >Drop NaNs (column-wise)</td></tr><tr><td style='text-align:center;' >Area</td><td style='text-align:center;' >Fill 0’s</td></tr><tr><td style='text-align:center;' >KDE</td><td style='text-align:center;' >Drop NaNs (column-wise)</td></tr><tr><td style='text-align:center;' >Hexbin</td><td style='text-align:center;' >Drop NaNs</td></tr><tr><td style='text-align:center;' >Pie</td><td style='text-align:center;' >Fill 0’s</td></tr></tbody>
+</table></figure>
+<p>&nbsp;</p>
+<h2>总结</h2>
+<p>上面是一些常用图的画法介绍，当然，我们还有很多可画的图如箱型图、区域面积图、等高线图等等，也能利用 matplotlib 来绘制地图，当然这些在这就暂时先不介绍了，以后需要了再一一补充。</p>
+<h2>参考</h2>
+<p>《利用python进行数据分析》第八章
+<a href='https://blog.csdn.net/wangxingfan316/article/details/80033557' target='_blank' class='url'>https://blog.csdn.net/wangxingfan316/article/details/80033557</a>
+<a href='https://blog.csdn.net/genome_denovo/article/details/78322628' target='_blank' class='url'>https://blog.csdn.net/genome_denovo/article/details/78322628</a>
+<a href='https://blog.csdn.net/Notzuonotdied/article/details/77876080' target='_blank' class='url'>https://blog.csdn.net/Notzuonotdied/article/details/77876080</a></p>
+</body>
+</html>
