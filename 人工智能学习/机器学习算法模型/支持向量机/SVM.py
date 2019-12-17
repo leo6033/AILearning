@@ -192,7 +192,7 @@ if __name__ == '__main__':
     # plt.plot(x_ponits, y_)
     #
     # # lr_clf.show_graph()
-
+    
     data_plus = []
     data_minus = []
     for i in range(len(X)):

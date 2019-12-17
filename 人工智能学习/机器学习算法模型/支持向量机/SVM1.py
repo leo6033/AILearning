@@ -359,13 +359,13 @@ def score(X_test, y_test, oS):
 
 if __name__ == "__main__":
     # 获取特征和目标变量
-    dataArr, labelArr = loadDataSet('testSetRBF2.txt')
+    dataArr, labelArr = loadDataSet('testSet.txt')
     X_train, X_test, y_train, y_test = train_test_split(dataArr, labelArr, test_size=0.3, random_state=4)
     # print labelArr
 
     # b是常量值， alphas是拉格朗日乘子
     # 0.6 0.001 40 0.5666666666666667
-    oS = smoP(X_train, y_train, 0.6, 0.001, 200, kTup=('rbf', 10))
+    oS = smoP(X_train, y_train, 0.6, 0.0001, 200, kTup=('rbf', 10))
     b = oS.b
     alphas = oS.alphas
     svInd = np.nonzero(alphas.A > 0)[0]
