@@ -1,8 +1,8 @@
-人工智能学习/AILearning/人工智能学习/NN/TensorFlow/data/*
+NN/TensorFlow/data/
 *.npz
 *.pdf
 *.gz
 *.zip
 *.meta
-*.jpg
-*.png
+*.pptx
+*data/
